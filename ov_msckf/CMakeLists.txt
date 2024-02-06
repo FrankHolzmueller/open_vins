@@ -7,9 +7,13 @@ project(ov_msckf)
 #set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/)
 
 # Find catkin (the ROS build system)
-find_package(catkin QUIET COMPONENTS roscpp rosbag tf std_msgs geometry_msgs sensor_msgs nav_msgs visualization_msgs cv_bridge ov_core)
+find_package(catkin REQUIRED COMPONENTS roscpp rosbag tf std_msgs geometry_msgs sensor_msgs nav_msgs visualization_msgs cv_bridge ov_core)
+set(CMAKE_PREFIX_PATH /home/robin/libtorch2)	
+set(TORCH_LIBRARIES "/home/robin/libtorch2/lib")
 
 # Include libraries
+find_package(Torch REQUIRED)
+
 find_package(Eigen3 REQUIRED)
 find_package(OpenCV 4 QUIET)
 if (NOT OpenCV_FOUND)
@@ -66,16 +70,8 @@ list(APPEND thirdparty_libraries
         ${Boost_LIBRARIES}
         ${OpenCV_LIBRARIES}
         ${catkin_LIBRARIES}
+        ${TORCH_LIBRARIES}
 )
-
-# If we are not building with ROS then we need to manually link to its headers
-# This isn't that elegant of a way, but this at least allows for building without ROS
-# See this stackoverflow answer: https://stackoverflow.com/a/11217008/7718197
-if (NOT catkin_FOUND)
-    message(WARNING "MANUALLY LINKING TO OV_CORE LIBRARY....")
-    include_directories(${ov_core_SOURCE_DIR}/src/)
-    list(APPEND thirdparty_libraries ov_core_lib)
-endif()
 
 ##################################################
 # Make the core library

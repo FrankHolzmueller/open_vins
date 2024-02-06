@@ -309,12 +309,15 @@ void TrackDescriptor::perform_detection_monocular(const cv::Mat& img0, std::vect
     assert(pts0.empty());
 
     // Extract our features (use FAST with griding)
-    std::vector<cv::KeyPoint> pts0_ext;
-    Grider_FAST::perform_griding(img0, pts0_ext, num_features, grid_x, grid_y, threshold, true);
+    //std::vector<cv::KeyPoint> pts0_ext;
+    //Grider_FAST::perform_griding(img0, pts0_ext, num_features, grid_x, grid_y, threshold, true);
 
     // For all new points, extract their descriptors
+    //cv::Mat desc0_ext;
+    //this->orb0->compute(img0, pts0_ext, desc0_ext);
     cv::Mat desc0_ext;
-    this->orb0->compute(img0, pts0_ext, desc0_ext);
+    std::vector<cv::KeyPoint> pts0_ext;
+    this->sp0(img0,cv::Mat(),pts0_ext,desc0_ext);
 
     // For all good matches, lets append to our returned vectors
     for(size_t i=0; i<pts0_ext.size(); i++) {
@@ -353,8 +356,8 @@ void TrackDescriptor::perform_detection_stereo(const cv::Mat &img0, const cv::Ma
     cv::Mat desc0_ext, desc1_ext;
 
     // Use C++11 lamdas so we can pass all theses variables by reference
-    std::thread t_desc0 = std::thread([this,&img0,&pts0_ext,&desc0_ext]{this->orb0->compute(img0, pts0_ext, desc0_ext);});
-    std::thread t_desc1 = std::thread([this,&img1,&pts1_ext,&desc1_ext]{this->orb1->compute(img1, pts1_ext, desc1_ext);});
+    std::thread t_desc0 = std::thread([this,&img0,&pts0_ext,&desc0_ext]{this->sp0(img0,cv::Mat(), pts0_ext, desc0_ext);});
+    std::thread t_desc1 = std::thread([this,&img1,&pts1_ext,&desc1_ext]{this->sp1(img1,cv::Mat(), pts1_ext, desc1_ext);});
     //std::thread t_desc0 = std::thread([this,&img0,&pts0_ext,&desc0_ext]{this->freak0->compute(img0, pts0_ext, desc0_ext);});
     //std::thread t_desc1 = std::thread([this,&img1,&pts1_ext,&desc1_ext]{this->freak1->compute(img1, pts1_ext, desc1_ext);});
 
